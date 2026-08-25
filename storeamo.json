@@ -1,13 +1,34 @@
 {
   "schema": "storeamo.app.v1",
-  "id": "miweb",
-  "name": "MiWeb",
-  "tagline": "Una lectura técnica rápida de una web pública.",
-  "description": "Auditoría no intrusiva de HTTP, HTTPS, SEO técnico, recursos y headers de seguridad.",
+  "id": "webamo",
+  "name": "WebAMO",
+  "tagline": "Auditor web técnico, claro y directo desde Android.",
+  "description": "Audita una URL pública desde el teléfono: HTTP/HTTPS, headers de seguridad, SEO técnico, tiempo de respuesta, peso HTML, accesibilidad básica, robots, sitemap, firmas conocidas de trackers y cookies observadas. Genera puntajes por área y un informe compartible/JSON sin backend propio de WebAMO.",
   "category": "Web",
-  "featured": false,
-  "status": "development",
-  "supported_platforms": ["windows", "macos", "linux", "android"],
-  "store": {"screenshots": []},
-  "verification": {"policy": "storeamo-default-v1", "required_checks": ["tests", "integrity"]}
+  "audience": "public",
+  "featured": true,
+  "status": "candidate",
+  "supported_platforms": ["android"],
+  "store": {
+    "screenshots": [],
+    "notes": "Candidate no intrusiva. No ejecuta exploits ni JavaScript como navegador completo; el puntaje es orientativo y no equivale a Lighthouse, pentest ni dictamen legal de privacidad."
+  },
+  "release": {
+    "provider": "github",
+    "repo": "amoedo7/MiWeb",
+    "channel": "stable",
+    "assets": [
+      {
+        "platform": "android",
+        "arch": "universal",
+        "format": "apk",
+        "pattern": "^WebAMO-.*\\.apk$",
+        "application_id": "com.desarrollamo.webamo"
+      }
+    ]
+  },
+  "verification": {
+    "policy": "storeamo-default-v1",
+    "required_checks": ["integrity", "application-id", "signature", "tests"]
+  }
 }
