@@ -5,102 +5,189 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class AuditReport {
-    public String target;
-    public String finalUrl;
+    public String target = "";
+    public String finalUrl = "";
     public int statusCode;
     public long elapsedMs;
     public int bodyBytes;
-    public String contentType;
-    public boolean https;
-    public boolean hsts;
-    public boolean csp;
-    public boolean noSniff;
-    public boolean referrerPolicy;
-    public boolean permissionsPolicy;
-    public boolean frameProtection;
-    public String title;
-    public String metaDescription;
-    public String canonical;
-    public String language;
-    public int h1Count;
-    public int images;
-    public int imagesWithoutAlt;
-    public boolean robotsOk;
-    public boolean sitemapOk;
-    public int securityScore;
-    public int seoScore;
-    public int performanceScore;
-    public int privacyScore;
-    public int accessibilityScore;
+    public String contentType = "";
+    public String platform = "No identificado";
+    public String stack = "No identificado";
+    public String renderMode = "No identificado";
+    public String cdn = "No identificado";
+    public String server = "";
+    public String tlsVersion = "";
+    public int tlsDaysLeft = Integer.MIN_VALUE;
+    public int crawlPages;
+    public int assetsDetected;
+    public long sampledAssetBytes;
+    public int thirdPartyHostCount;
+
     public int overallScore;
+    public int overallCoverage;
+    public String grade = "";
+    public String risk = "";
+    public int criticalCount;
+    public int highCount;
+    public int mediumCount;
+    public int lowCount;
+
+    public Integer previousScore;
+    public Integer scoreDelta;
+    public int regressions;
+    public int resolved;
+
+    public final LinkedHashMap<String, Integer> categoryScores = new LinkedHashMap<>();
+    public final LinkedHashMap<String, Integer> categoryCoverage = new LinkedHashMap<>();
+    public final List<AuditCheck> checks = new ArrayList<>();
     public final List<String> trackers = new ArrayList<>();
     public final List<String> cookies = new ArrayList<>();
-    public final List<String> findings = new ArrayList<>();
+    public final List<String> thirdPartyHosts = new ArrayList<>();
+    public final List<String> notes = new ArrayList<>();
+
+    public List<AuditCheck> problems() {
+        List<AuditCheck> out = new ArrayList<>();
+        for (AuditCheck check : checks) if (check.isProblem()) out.add(check);
+        out.sort((a, b) -> {
+            int severity = Integer.compare(b.severityRank(), a.severityRank());
+            return severity != 0 ? severity : Integer.compare(b.weight, a.weight);
+        });
+        return out;
+    }
+
+    public List<AuditCheck> strengths() {
+        List<AuditCheck> out = new ArrayList<>();
+        for (AuditCheck check : checks) {
+            if (AuditCheck.PASS.equals(check.status) && check.weight >= 2) out.add(check);
+        }
+        out.sort((a, b) -> Integer.compare(b.weight, a.weight));
+        return out;
+    }
+
+    public int knownScoredChecks() {
+        int n = 0;
+        for (AuditCheck c : checks) if (c.weight > 0 && c.isKnown()) n++;
+        return n;
+    }
+
+    public int scoredChecks() {
+        int n = 0;
+        for (AuditCheck c : checks) if (c.weight > 0) n++;
+        return n;
+    }
 
     public JSONObject toJson() throws JSONException {
         JSONObject root = new JSONObject();
-        root.put("schema", "desarrollamo.webamo.v1");
+        root.put("schema", "desarrollamo.webamo.v2");
+        root.put("version", "0.1.1");
         root.put("target", target);
         root.put("final_url", finalUrl);
         root.put("status", statusCode);
         root.put("elapsed_ms", elapsedMs);
         root.put("body_bytes", bodyBytes);
-        root.put("content_type", contentType == null ? JSONObject.NULL : contentType);
+        root.put("content_type", contentType);
+
+        JSONObject fingerprint = new JSONObject();
+        fingerprint.put("platform", platform);
+        fingerprint.put("stack", stack);
+        fingerprint.put("render", renderMode);
+        fingerprint.put("cdn", cdn);
+        fingerprint.put("server", server);
+        fingerprint.put("tls_version", tlsVersion);
+        fingerprint.put("tls_days_left", tlsDaysLeft == Integer.MIN_VALUE ? JSONObject.NULL : tlsDaysLeft);
+        root.put("fingerprint", fingerprint);
+
+        JSONObject scope = new JSONObject();
+        scope.put("crawl_pages", crawlPages);
+        scope.put("assets_detected", assetsDetected);
+        scope.put("sampled_asset_bytes", sampledAssetBytes);
+        scope.put("third_party_hosts", thirdPartyHostCount);
+        scope.put("scored_checks", scoredChecks());
+        scope.put("known_scored_checks", knownScoredChecks());
+        scope.put("coverage", overallCoverage);
+        root.put("scope", scope);
 
         JSONObject scores = new JSONObject();
         scores.put("overall", overallScore);
-        scores.put("security", securityScore);
-        scores.put("seo", seoScore);
-        scores.put("performance", performanceScore);
-        scores.put("privacy_signals", privacyScore);
-        scores.put("accessibility_basic", accessibilityScore);
+        scores.put("grade", grade);
+        scores.put("risk", risk);
+        JSONObject areas = new JSONObject();
+        for (Map.Entry<String, Integer> e : categoryScores.entrySet()) {
+            JSONObject row = new JSONObject();
+            row.put("score", e.getValue());
+            row.put("coverage", categoryCoverage.getOrDefault(e.getKey(), 100));
+            areas.put(e.getKey().toLowerCase(), row);
+        }
+        scores.put("areas", areas);
         root.put("scores", scores);
 
-        JSONObject security = new JSONObject();
-        security.put("https", https);
-        security.put("hsts", hsts);
-        security.put("csp", csp);
-        security.put("nosniff", noSniff);
-        security.put("referrer_policy", referrerPolicy);
-        security.put("permissions_policy", permissionsPolicy);
-        security.put("frame_protection", frameProtection);
-        root.put("security", security);
+        JSONObject severity = new JSONObject();
+        severity.put("critical", criticalCount);
+        severity.put("high", highCount);
+        severity.put("medium", mediumCount);
+        severity.put("low", lowCount);
+        root.put("severity", severity);
 
-        JSONObject seo = new JSONObject();
-        seo.put("title", title == null ? JSONObject.NULL : title);
-        seo.put("meta_description", metaDescription == null ? JSONObject.NULL : metaDescription);
-        seo.put("canonical", canonical == null ? JSONObject.NULL : canonical);
-        seo.put("lang", language == null ? JSONObject.NULL : language);
-        seo.put("h1_count", h1Count);
-        seo.put("images", images);
-        seo.put("images_without_alt", imagesWithoutAlt);
-        seo.put("robots_ok", robotsOk);
-        seo.put("sitemap_ok", sitemapOk);
-        root.put("seo", seo);
-
+        JSONArray rows = new JSONArray();
+        for (AuditCheck check : checks) rows.put(check.toJson());
+        root.put("checks", rows);
         root.put("trackers", new JSONArray(trackers));
         root.put("cookies", new JSONArray(cookies));
-        root.put("findings", new JSONArray(findings));
-        root.put("note", "Auditoría técnica no intrusiva. No es pentest, Lighthouse ni dictamen legal de privacidad.");
+        root.put("third_party_hosts", new JSONArray(thirdPartyHosts));
+        root.put("notes", new JSONArray(notes));
+
+        JSONObject history = new JSONObject();
+        history.put("previous_score", previousScore == null ? JSONObject.NULL : previousScore);
+        history.put("delta", scoreDelta == null ? JSONObject.NULL : scoreDelta);
+        history.put("regressions", regressions);
+        history.put("resolved", resolved);
+        root.put("history", history);
+
+        root.put("note", "Auditoría pública, defensiva y no destructiva. Los controles no verificables se muestran como N/V; no es pentest, Lighthouse ni dictamen legal.");
         return root;
     }
 
     public String shareText() {
         StringBuilder out = new StringBuilder();
-        out.append("WebAMO · ").append(target).append('\n');
-        out.append("Puntaje general: ").append(overallScore).append("/100\n");
-        out.append("Seguridad ").append(securityScore)
-                .append(" · SEO ").append(seoScore)
-                .append(" · Rendimiento ").append(performanceScore)
-                .append(" · Privacidad ").append(privacyScore)
-                .append(" · Accesibilidad ").append(accessibilityScore).append("\n\n");
-        for (String finding : findings) out.append("• ").append(finding).append('\n');
-        if (!trackers.isEmpty()) out.append("\nRastreadores: ").append(String.join(", ", trackers)).append('\n');
-        if (!cookies.isEmpty()) out.append("Cookies observadas: ").append(String.join(", ", cookies)).append('\n');
-        out.append("\nAuditoría no intrusiva realizada desde el dispositivo.");
+        out.append("WebAMO 0.1.1 · ").append(target).append('\n');
+        out.append("Puntaje general: ").append(overallScore).append("/100 · ").append(grade)
+                .append(" · Riesgo ").append(risk).append('\n');
+        out.append("Cobertura: ").append(overallCoverage).append("% · ")
+                .append(knownScoredChecks()).append('/').append(scoredChecks()).append(" controles puntuables\n\n");
+
+        for (Map.Entry<String, Integer> e : categoryScores.entrySet()) {
+            out.append(e.getKey()).append(' ').append(e.getValue()).append("/100")
+                    .append(" (cob ").append(categoryCoverage.getOrDefault(e.getKey(), 100)).append("%) · ");
+        }
+        if (!categoryScores.isEmpty()) out.setLength(Math.max(0, out.length() - 3));
+        out.append("\n\nPrioridades:\n");
+
+        List<AuditCheck> problems = problems();
+        if (problems.isEmpty()) {
+            out.append("• No se detectaron problemas puntuables en la parte verificable.\n");
+        } else {
+            int max = Math.min(8, problems.size());
+            for (int i = 0; i < max; i++) {
+                AuditCheck c = problems.get(i);
+                out.append("• [").append(c.severity).append("] ").append(c.label).append(": ").append(c.detail);
+                if (!c.recommendation.isBlank()) out.append(" → ").append(c.recommendation);
+                out.append('\n');
+            }
+        }
+
+        out.append("\nAlcance: ").append(crawlPages).append(" pág. crawl · ")
+                .append(assetsDetected).append(" assets · ")
+                .append(thirdPartyHostCount).append(" hosts terceros.");
+        if (previousScore != null) {
+            out.append("\nHistorial: ").append(previousScore).append(" → ").append(overallScore)
+                    .append(" (").append(scoreDelta >= 0 ? "+" : "").append(scoreDelta).append(")");
+        }
+        out.append("\n\nAuditoría no intrusiva realizada desde el dispositivo.");
         return out.toString();
     }
 }
