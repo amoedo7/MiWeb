@@ -2,8 +2,8 @@
   "schema": "storeamo.app.v1",
   "id": "webamo",
   "name": "WebAMO",
-  "tagline": "Auditor web técnico, claro y directo desde Android.",
-  "description": "Audita una URL pública desde el teléfono: HTTP/HTTPS, headers de seguridad, SEO técnico, tiempo de respuesta, peso HTML, accesibilidad básica, robots, sitemap, firmas conocidas de trackers y cookies observadas. Genera puntajes por área y un informe compartible/JSON sin backend propio de WebAMO.",
+  "tagline": "Auditor web técnico, visual y explicable desde Android.",
+  "description": "Audita una web pública desde el teléfono con un dashboard visual y cobertura explícita: HTTP/HTTPS, TLS/DNS, headers de seguridad, CORS, cookies, SEO técnico, datos estructurados, mini-crawl, assets, rendimiento observado, accesibilidad estática, privacidad, terceros, PWA/IA y fingerprint de plataforma/stack. Prioriza hallazgos por severidad, conserva historial local y exporta un JSON completo sin backend propio.",
   "category": "Web",
   "audience": "public",
   "featured": true,
@@ -11,7 +11,7 @@
   "supported_platforms": ["android"],
   "store": {
     "screenshots": [],
-    "notes": "Candidate no intrusiva. No ejecuta exploits ni JavaScript como navegador completo; el puntaje es orientativo y no equivale a Lighthouse, pentest ni dictamen legal de privacidad."
+    "notes": "WebAMO 0.1.1 candidate. Auditoría pública, defensiva y no destructiva. Los controles que requieren navegador renderizado, interacción o autorización se muestran como N/V y reducen cobertura en lugar de inventar resultados. No equivale a Lighthouse, pentest ni dictamen legal."
   },
   "release": {
     "provider": "github",
@@ -29,6 +29,6 @@
   },
   "verification": {
     "policy": "storeamo-default-v1",
-    "required_checks": ["integrity", "application-id", "signature", "tests"]
+    "required_checks": ["integrity", "application-id", "signature", "permissions", "tests"]
   }
 }
