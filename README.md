@@ -1,68 +1,59 @@
 <div align="center">
 
-# MiWeb
+# WebAMO
 
-**Poné una URL. Recibí un diagnóstico técnico claro y exportable.**
+**Poné una URL. Recibí una auditoría técnica clara desde el teléfono.**
 
-[![CI](https://github.com/amoedo7/MiWeb/actions/workflows/ci.yml/badge.svg)](https://github.com/amoedo7/MiWeb/actions/workflows/ci.yml)
+`HTTPS` · `headers` · `SEO técnico` · `rendimiento` · `accesibilidad básica` · `trackers` · `cookies` · `JSON`
 
-`HTTPS` · `headers` · `SEO técnico` · `HTML` · `accesibilidad básica` · `JSON`
 </div>
 
 ---
 
-## Qué revisa
+## Qué es
 
-MiWeb hace una lectura no destructiva de una URL pública y resume:
+WebAMO es el auditor web de DesarrollAMO. La app Android hace una lectura pública y no intrusiva desde el propio dispositivo, sin backend de WebAMO y sin cuenta.
 
-- estado HTTP y URL final;
-- tiempo de respuesta observado;
+La base nació como **MiWeb**, un auditor CLI para Termux/Python. Ese motor se conserva en `miweb.py` como herramienta de escritorio/terminal; la aplicación Android es la evolución orientada a uso cotidiano.
+
+## Qué revisa la app Android
+
+- estado HTTP, redirección final y tiempo de respuesta observado;
 - HTTPS;
-- `Content-Type`;
-- headers de seguridad habituales;
-- `<title>` y meta description;
-- canonical;
-- Open Graph;
-- cantidad de H1;
+- headers de seguridad: HSTS, CSP, `nosniff`, Referrer-Policy, Permissions-Policy y protección de frames;
+- `<title>`, meta description, canonical, idioma y cantidad de H1;
 - imágenes sin `alt`;
-- `robots.txt` y `sitemap.xml`;
-- score técnico orientativo.
+- presencia de `robots.txt` y `sitemap.xml`;
+- firmas conocidas de Google Analytics, GTM, Google Ads/DoubleClick, Meta Pixel, Hotjar, Microsoft Clarity, TikTok Pixel y LinkedIn Insight;
+- cookies expuestas mediante `Set-Cookie` en la respuesta;
+- puntajes separados de Seguridad, SEO, Rendimiento, Privacidad (señales) y Accesibilidad básica;
+- informe compartible y JSON exportable.
 
-No intenta explotar vulnerabilidades ni realizar pruebas intrusivas.
+## Límites deliberados
 
-## Ejecutar
+WebAMO **no ejecuta exploits, no intenta saltar autenticación y no hace pentesting**. Tampoco ejecuta JavaScript como un navegador completo, así que un tracker cargado dinámicamente puede no aparecer en la lectura inicial. El puntaje es orientativo y no debe presentarse como Lighthouse, auditoría legal de privacidad ni certificación de seguridad.
+
+## Android
+
+Paquete: `com.desarrollamo.webamo`
+
+Versión inicial: `0.1.0`
+
+Compilar:
+
+```bash
+gradle :app:testDebugUnitTest :app:assembleDebug
+```
+
+El workflow `WebAMO Android` valida paquete, versión, permisos y firma antes de publicar el APK de la candidate.
+
+## CLI legado
 
 ```bash
 python miweb.py https://example.com
-```
-
-Guardar informe:
-
-```bash
 python miweb.py https://example.com --output informe.json
 ```
 
-Modo liviano, sin consultar `robots.txt` ni `sitemap.xml`:
-
-```bash
-python miweb.py https://example.com --light
-```
-
-## Ejemplo de salida
-
-```json
-{
-  "schema": "desarrollamo.miweb.v1",
-  "target": "https://example.com",
-  "http": {"status": 200, "https": true},
-  "seo": {"title": "Example Domain", "h1_count": 1},
-  "security_headers": {"hsts": false},
-  "summary": {"score": 72}
-}
-```
-
-El score es una ayuda para leer el informe: **no reemplaza una auditoría de seguridad, accesibilidad o rendimiento especializada**.
-
 ---
 
-**DesarrollAMO** · una URL puede ser el comienzo de una conversación concreta sobre qué mejorar.
+**DesarrollAMO** · una URL puede ser el comienzo de una mejora concreta.
