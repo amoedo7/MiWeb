@@ -11,7 +11,7 @@
   "supported_platforms": ["android"],
   "store": {
     "screenshots": [],
-    "notes": "WebAMO 0.1.2 candidate. Mantiene la auditoría pública, defensiva y no destructiva de 0.1.1 y agrega Copiar informe al portapapeles, además de Compartir informe y Copiar JSON completo. Los controles que requieren navegador renderizado, interacción o autorización se muestran como N/V y reducen cobertura en lugar de inventar resultados."
+    "notes": "WebAMO 0.1.2 candidate. Mantiene la auditoría pública, defensiva y no destructiva de 0.1.1 y agrega Copiar informe al portapapeles. Desde esta publicación usa una identidad de firma candidate canónica y estable para que las próximas versiones puedan actualizarse encima sin volver a desinstalar. Una instalación antigua con firma efímera puede requerir una última migración."
   },
   "release": {
     "provider": "github",
@@ -26,7 +26,8 @@
         "format": "apk",
         "pattern": "^WebAMO-.*\\.apk$",
         "application_id": "com.desarrollamo.webamo",
-        "min_os": "Android 6.0 (API 23)"
+        "min_os": "Android 6.0 (API 23)",
+        "signing_cert_sha256": "b34195794371b95087ee32d70c32176d46fa501408702329ebec4d81362ff1e8"
       }
     ]
   },
