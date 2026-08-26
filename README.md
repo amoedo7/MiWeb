@@ -4,17 +4,17 @@
 
 **Poné una URL. Recibí una auditoría técnica visual, explicable y exportable desde Android.**
 
-`TLS/DNS` · `headers` · `SEO` · `mini-crawl` · `assets` · `rendimiento` · `privacidad` · `accesibilidad` · `PWA/IA` · `historial` · `JSON`
+`TLS/DNS` · `headers` · `SEO` · `mini-crawl` · `assets` · `rendimiento` · `privacidad` · `accesibilidad` · `PWA/IA` · `historial` · `informe` · `JSON`
 
 </div>
 
 ---
 
-## WebAMO 0.1.1
+## WebAMO 0.1.2
 
 WebAMO es el auditor web de DesarrollAMO. La app Android realiza lecturas públicas, defensivas y no destructivas desde el propio dispositivo, sin backend de WebAMO y sin cuenta.
 
-La base nació como **MiWeb** y como la familia **AuditorWeb** para Termux/Python. La v0.1.1 recupera la idea importante de aquellos auditores: no mirar sólo cinco números, sino explicar cobertura, riesgo, prioridades, contexto técnico y evolución entre auditorías.
+La base nació como **MiWeb** y como la familia **AuditorWeb** para Termux/Python. La v0.1.2 conserva la auditoría profunda y el dashboard de 0.1.1 y agrega una salida más práctica: **Copiar informe** lleva al portapapeles exactamente el reporte legible que se comparte, sin abrir otra app. Compartir informe y Copiar JSON completo siguen disponibles por separado.
 
 ## Qué revisa
 
@@ -29,7 +29,7 @@ La base nació como **MiWeb** y como la familia **AuditorWeb** para Termux/Pytho
 - trackers conocidos, cookies y flags, hosts terceros, políticas visibles y señales de APIs sensibles;
 - fingerprint orientativo de plataforma, framework/stack, CDN/proxy, librerías, endpoints visibles, PWA, llms.txt y reglas de robots para crawlers de IA;
 - historial local por dominio: puntaje anterior, delta, regresiones y hallazgos resueltos;
-- JSON completo con todos los controles, severidad, recomendación, puntaje y cobertura.
+- informe legible compartible/copiante y JSON completo con todos los controles, severidad, recomendación, puntaje y cobertura.
 
 ## Dashboard
 
@@ -47,7 +47,7 @@ Los puntajes son orientativos: no reemplazan Lighthouse, un pentest, una auditor
 
 Paquete: `com.desarrollamo.webamo`
 
-Versión candidate: `0.1.1`
+Versión candidate: `0.1.2`
 
 ```bash
 gradle :app:testDebugUnitTest :app:assembleDebug

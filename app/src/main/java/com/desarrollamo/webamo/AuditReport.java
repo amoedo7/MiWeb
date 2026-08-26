@@ -84,7 +84,7 @@ public final class AuditReport {
     public JSONObject toJson() throws JSONException {
         JSONObject root = new JSONObject();
         root.put("schema", "desarrollamo.webamo.v2");
-        root.put("version", "0.1.1");
+        root.put("version", "0.1.2");
         root.put("target", target);
         root.put("final_url", finalUrl);
         root.put("status", statusCode);
@@ -154,7 +154,7 @@ public final class AuditReport {
 
     public String shareText() {
         StringBuilder out = new StringBuilder();
-        out.append("WebAMO 0.1.1 · ").append(target).append('\n');
+        out.append("WebAMO 0.1.2 · ").append(target).append('\n');
         out.append("Puntaje general: ").append(overallScore).append("/100 · ").append(grade)
                 .append(" · Riesgo ").append(risk).append('\n');
         out.append("Cobertura: ").append(overallCoverage).append("% · ")

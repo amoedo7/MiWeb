@@ -3,7 +3,7 @@
   "id": "webamo",
   "name": "WebAMO",
   "tagline": "Auditor web técnico, visual y explicable desde Android.",
-  "description": "Audita una web pública desde el teléfono con un dashboard visual y cobertura explícita: HTTP/HTTPS, TLS/DNS, headers de seguridad, CORS, cookies, SEO técnico, datos estructurados, mini-crawl, assets, rendimiento observado, accesibilidad estática, privacidad, terceros, PWA/IA y fingerprint de plataforma/stack. Prioriza hallazgos por severidad, conserva historial local y exporta un JSON completo sin backend propio.",
+  "description": "Audita una web pública desde el teléfono con un dashboard visual y cobertura explícita: HTTP/HTTPS, TLS/DNS, headers de seguridad, CORS, cookies, SEO técnico, datos estructurados, mini-crawl, assets, rendimiento observado, accesibilidad estática, privacidad, terceros, PWA/IA y fingerprint de plataforma/stack. Prioriza hallazgos por severidad, conserva historial local y permite compartir, copiar el informe legible o exportar el JSON completo sin backend propio.",
   "category": "Web",
   "audience": "public",
   "featured": true,
@@ -11,7 +11,7 @@
   "supported_platforms": ["android"],
   "store": {
     "screenshots": [],
-    "notes": "WebAMO 0.1.1 candidate. Auditoría pública, defensiva y no destructiva. Los controles que requieren navegador renderizado, interacción o autorización se muestran como N/V y reducen cobertura en lugar de inventar resultados. No equivale a Lighthouse, pentest ni dictamen legal."
+    "notes": "WebAMO 0.1.2 candidate. Mantiene la auditoría pública, defensiva y no destructiva de 0.1.1 y agrega Copiar informe al portapapeles, además de Compartir informe y Copiar JSON completo. Los controles que requieren navegador renderizado, interacción o autorización se muestran como N/V y reducen cobertura en lugar de inventar resultados."
   },
   "release": {
     "provider": "github",
