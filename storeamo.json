@@ -17,13 +17,16 @@
     "provider": "github",
     "repo": "amoedo7/MiWeb",
     "channel": "stable",
+    "version": "0.1.2",
+    "version_code": "3",
     "assets": [
       {
         "platform": "android",
         "arch": "universal",
         "format": "apk",
         "pattern": "^WebAMO-.*\\.apk$",
-        "application_id": "com.desarrollamo.webamo"
+        "application_id": "com.desarrollamo.webamo",
+        "min_os": "Android 6.0 (API 23)"
       }
     ]
   },
