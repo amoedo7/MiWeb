@@ -47,6 +47,7 @@ public final class MainActivity extends Activity {
     private CheckBox quickCheck;
     private Button auditButton;
     private Button shareButton;
+    private Button copyReportButton;
     private Button copyButton;
     private Button allChecksButton;
     private ProgressBar loading;
@@ -93,7 +94,7 @@ public final class MainActivity extends Activity {
         brandRow.setGravity(Gravity.CENTER_VERTICAL);
         TextView badge = pill("DESARROLLAMO", ORANGE, Color.rgb(38, 24, 4));
         brandRow.addView(badge);
-        TextView version = text("WebAMO · v0.1.1", 12, MUTED, Typeface.BOLD);
+        TextView version = text("WebAMO · v0.1.2", 12, MUTED, Typeface.BOLD);
         LinearLayout.LayoutParams vp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
         vp.leftMargin = dp(10);
         brandRow.addView(version, vp);
@@ -240,14 +241,20 @@ public final class MainActivity extends Activity {
 
         LinearLayout actions = card(CARD);
         shareButton = button("Compartir informe", ORANGE, Color.rgb(34, 20, 2));
+        copyReportButton = button("Copiar informe", CYAN, Color.rgb(2, 14, 25));
         copyButton = button("Copiar JSON completo", Color.rgb(25, 52, 72), TEXT);
         shareButton.setEnabled(false);
+        copyReportButton.setEnabled(false);
         copyButton.setEnabled(false);
         actions.addView(shareButton, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
+        LinearLayout.LayoutParams reportP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
+        reportP.topMargin = dp(9);
+        actions.addView(copyReportButton, reportP);
         LinearLayout.LayoutParams copyP = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48));
         copyP.topMargin = dp(9);
         actions.addView(copyButton, copyP);
         shareButton.setOnClickListener(v -> shareReport());
+        copyReportButton.setOnClickListener(v -> copyReport());
         copyButton.setOnClickListener(v -> copyJson());
         root.addView(actions, spaced());
 
@@ -322,6 +329,7 @@ public final class MainActivity extends Activity {
         allChecksText.setText(formatAllChecks(report));
         allChecksButton.setEnabled(true);
         shareButton.setEnabled(true);
+        copyReportButton.setEnabled(true);
         copyButton.setEnabled(true);
     }
 
@@ -445,6 +453,7 @@ public final class MainActivity extends Activity {
         quickCheck.setEnabled(!busy);
         if (busy) {
             shareButton.setEnabled(false);
+            copyReportButton.setEnabled(false);
             copyButton.setEnabled(false);
             allChecksButton.setEnabled(false);
         }
@@ -455,11 +464,22 @@ public final class MainActivity extends Activity {
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_SUBJECT, "WebAMO 0.1.1 · " + lastReport.target);
+            intent.putExtra(Intent.EXTRA_SUBJECT, "WebAMO 0.1.2 · " + lastReport.target);
             intent.putExtra(Intent.EXTRA_TEXT, lastReport.shareText());
             startActivity(Intent.createChooser(intent, "Compartir informe WebAMO"));
         } catch (Exception e) {
             Toast.makeText(this, "No se pudo compartir", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void copyReport() {
+        if (lastReport == null) return;
+        try {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setPrimaryClip(ClipData.newPlainText("WebAMO informe", lastReport.shareText()));
+            Toast.makeText(this, "Informe copiado", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, "No se pudo copiar el informe", Toast.LENGTH_SHORT).show();
         }
     }
 
