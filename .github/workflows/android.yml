@@ -7,7 +7,6 @@ on:
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
-      - 'storeamo.json'
       - '.github/workflows/android.yml'
   pull_request:
     branches: [main]
@@ -15,7 +14,6 @@ on:
       - 'app/**'
       - 'build.gradle'
       - 'settings.gradle'
-      - 'storeamo.json'
       - '.github/workflows/android.yml'
   workflow_dispatch:
 
@@ -38,6 +36,15 @@ jobs:
 
       - name: Install Android SDK
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0" >/dev/null
+
+      - name: Prepare canonical AMO candidate signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.android"
+          curl -fsSL 'https://raw.githubusercontent.com/amoedo7/StoreAMO/bde381596b23e356ec9a16f966d47c28c90e8b1d/ci/storeamo-debug.keystore.b64' \
+            | base64 -d > "$HOME/.android/debug.keystore"
+          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
 
       - name: Test and build
         run: gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug --stacktrace
@@ -76,10 +83,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          EXPECTED_CERT="$(tr -d '\r\n' < dist/SIGNING_CERT_SHA256.txt)"
           if gh release view v0.1.2 >/dev/null 2>&1; then
+            rm -rf /tmp/webamo-existing
+            mkdir -p /tmp/webamo-existing
+            EXISTING_CERT=''
+            if gh release download v0.1.2 --pattern SIGNING_CERT_SHA256.txt --dir /tmp/webamo-existing >/dev/null 2>&1; then
+              EXISTING_CERT="$(tr -d '\r\n' < /tmp/webamo-existing/SIGNING_CERT_SHA256.txt)"
+            fi
+            if [ "$EXISTING_CERT" = "$EXPECTED_CERT" ]; then
+              echo 'WebAMO v0.1.2 ya usa la firma candidate canónica; no se reemplaza el APK.'
+              exit 0
+            fi
+            echo 'Migrando WebAMO v0.1.2 una única vez a la firma candidate canónica.'
             gh release upload v0.1.2 dist/WebAMO-0.1.2.apk dist/WebAMO-0.1.2.apk.sha256 dist/SIGNING_CERT_SHA256.txt --clobber
           else
             gh release create v0.1.2 dist/WebAMO-0.1.2.apk dist/WebAMO-0.1.2.apk.sha256 dist/SIGNING_CERT_SHA256.txt \
               --title 'WebAMO v0.1.2' \
-              --notes 'WebAMO 0.1.2 conserva la auditoría profunda y el dashboard de 0.1.1 y agrega Copiar informe para llevar el reporte legible directamente al portapapeles, manteniendo Compartir informe y Copiar JSON completo.'
+              --notes 'WebAMO 0.1.2 conserva la auditoría profunda y el dashboard de 0.1.1, agrega Copiar informe y fija una firma candidate estable para que las próximas actualizaciones puedan instalarse encima sin volver a desinstalar.'
           fi
